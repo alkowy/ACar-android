@@ -53,7 +53,7 @@ class OrderFragment() : Fragment() {
             navController.navigate(R.id.action_orderFragment_to_postOrderFragment)
         }
 
-
+//developing branch
         binding.orderButton.setOnClickListener {
             if (setStringPickupAndDestinationAddress()) {
                 viewModel.getLatLngFromAddresses(geoCoder)
