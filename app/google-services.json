@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "652049598300",
+    "project_id": "acar-7a64b",
+    "storage_bucket": "acar-7a64b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:652049598300:android:7063e9e26b0bc9673ce399",
+        "android_client_info": {
+          "package_name": "com.example.acar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "652049598300-o4l4boq5a0h7ubnsns7att8lt53unl25.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDs3Toy7Jg2gi0YJLG11CiShDEoZc_BlFU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "652049598300-o4l4boq5a0h7ubnsns7att8lt53unl25.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
