@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".register.RegistrationFragment">
+
+    <TextView
+        android:id="@+id/registerHeaderText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Registration screen"
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/registerPasswordFirst"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="Password"
+        android:inputType="textPassword"
+        app:layout_constraintStart_toStartOf="@+id/registerEmailText"
+        app:layout_constraintTop_toBottomOf="@+id/registerEmailText" />
+
+    <EditText
+        android:id="@+id/registerPasswordSecond"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="Repeat password"
+        android:inputType="textPassword"
+        app:layout_constraintStart_toStartOf="@+id/registerPasswordFirst"
+        app:layout_constraintTop_toBottomOf="@+id/registerPasswordFirst" />
+
+    <EditText
+        android:id="@+id/registerEmailText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:ems="10"
+        android:hint="E-mail"
+        android:inputType="textEmailAddress"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/registerHeaderText" />
+
+    <Button
+        android:id="@+id/registerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Register"
+        app:layout_constraintEnd_toEndOf="@+id/registerPasswordSecond"
+        app:layout_constraintTop_toBottomOf="@+id/registerPasswordSecond" />
+
+    <TextView
+        android:id="@+id/registerBackToLoginText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/backToLogin"
+        app:layout_constraintEnd_toEndOf="@+id/registerButton"
+        app:layout_constraintTop_toBottomOf="@+id/registerButton" />
+</androidx.constraintlayout.widget.ConstraintLayout>
