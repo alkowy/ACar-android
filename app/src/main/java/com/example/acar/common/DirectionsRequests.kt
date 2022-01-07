@@ -13,7 +13,4 @@ interface DirectionsRequests {
     fun getDirections(@Query("origin") origin: String, @Query("destination") destination: String,
                       @Query("key") key: String): Call<DirectionsModel>
 
-    @GET ("maps/api/directions/json?")
-    fun getDuration(@Query("origin") origin: String, @Query("destination") destination: String,
-                    @Query("key") key: String): Call<Leg>
 }

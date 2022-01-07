@@ -10,6 +10,7 @@ import com.example.acar.ACarApplication
 import com.example.acar.BuildConfig
 
 import com.example.acar.R
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.PolyUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -36,39 +37,29 @@ class GoogleApiRepository @Inject constructor() {
         _directionsResponse.value = response
     }
 
-
-
-    suspend fun getDirections(): ResponseBody? {
-        return withContext(Dispatchers.IO) {
-            val client = OkHttpClient().newBuilder().build()
-            val request = Request.Builder().url(
-                "https://maps.googleapis.com/maps/api/directions/json?origin=50.270908,19.039993&destination=50.049683,19.944544&key=***REMOVED***")
-                .method("GET", null).build()
-            val response = client.newCall(request).execute()
-            response.body()
-        }
-    }
     // returns duration in seconds
-    suspend fun getDuration(origin: String, destination: String) : Long{
+    suspend fun getDuration(origin: String, destination: String): Long {
         var duration: Long = 0
-        val directions = Retrofit.Builder().baseUrl("https://maps.googleapis.com/").addConverterFactory(GsonConverterFactory.create()).build()
-            .create(DirectionsRequests::class.java)
+        val directions =
+            Retrofit.Builder().baseUrl("https://maps.googleapis.com/").addConverterFactory(GsonConverterFactory.create()).build()
+                .create(DirectionsRequests::class.java)
 
-        withContext(Dispatchers.IO){
+        withContext(Dispatchers.IO) {
             val response = directions.getDirections(origin, destination, apiKey).awaitResponse()
             Log.d("googleapirepo", response.toString())
             if (response.isSuccessful) {
                 Log.d("googleapirepository", response.body().toString())
                 val routes = response.body()?.routes
-                Log.d("googleapirepository", "getduration overviewpolyline           " + routes!!.first().overviewPolyline.points.toString())
+                Log.d("googleapirepository",
+                    "getduration overviewpolyline           " + routes!!.first().overviewPolyline.points.toString())
                 for (route in routes) {
-                    for(leg in route.legs){
-                        duration  += leg.duration.value
+                    for (leg in route.legs) {
+                        duration += leg.duration.value
                     }
                 }
             }
         }
-        Log.d("googleapirepository","getduration nizej        "+ duration)
+        Log.d("googleapirepository", "getduration nizej        " + duration)
         return duration
     }
 
@@ -95,8 +86,27 @@ class GoogleApiRepository @Inject constructor() {
 
             }
         }
-        Log.d("googleapirepository","getpolylines        "+ polyLines)
+        Log.d("googleapirepository", "getpolylines        " + polyLines)
         return polyLines
+    }
+    // returns route length in meters
+    suspend fun getRouteLength(origin: String, destination: String): Double {
+        var routeLength = 0
+        val directions =
+            Retrofit.Builder().baseUrl("https://maps.googleapis.com/").addConverterFactory(GsonConverterFactory.create()).build()
+                .create(DirectionsRequests::class.java)
+        withContext(Dispatchers.IO) {
+            val response = directions.getDirections(origin, destination, apiKey).awaitResponse()
+            if (response.isSuccessful) {
+                val routes = response.body()?.routes
+                for (route in routes!!) {
+                    for(leg in route.legs){
+                        routeLength += leg.distance.value
+                    }
+                }
+            }
+        }
+        return routeLength.toDouble()
     }
 }
 

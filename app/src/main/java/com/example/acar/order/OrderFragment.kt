@@ -1,6 +1,7 @@
 package com.example.acar.order
 
 
+import android.Manifest
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -18,6 +19,7 @@ import android.location.Geocoder
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
@@ -26,6 +28,7 @@ import com.example.acar.R
 import com.example.acar.common.AppModule
 import com.example.acar.common.GlobalToast
 import com.example.acar.common.GoogleApiRepository
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
@@ -53,7 +56,6 @@ class OrderFragment() : Fragment() {
             navController.navigate(R.id.action_orderFragment_to_postOrderFragment)
         }
 
-//developing branch
         binding.orderButton.setOnClickListener {
             if (setStringPickupAndDestinationAddress()) {
                 viewModel.getLatLngFromAddresses(geoCoder)
@@ -85,29 +87,6 @@ class OrderFragment() : Fragment() {
         geoCoder = Geocoder(context)
         return binding.root
     }
-
-    private fun getLocationFromAddress(context: Context, strAddress: String): LatLng? {
-
-        val addressList: List<Address>
-        var p1: LatLng? = null
-        try {
-
-            addressList = geoCoder.getFromLocationName(strAddress, 5)
-
-            if (addressList.isEmpty()) {
-                Log.d("orderfragment", addressList.toString())
-                return null
-
-            }
-            val location = addressList[0]
-            p1 = LatLng(location.latitude, location.longitude)
-        } catch (exception: IOException) {
-            exception.printStackTrace()
-        }
-        return p1
-    }
-
-
 
     private fun createPickupAndDestinationMarkers() {
         var position: LatLng

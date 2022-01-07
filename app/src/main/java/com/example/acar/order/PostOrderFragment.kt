@@ -61,55 +61,44 @@ class PostOrderFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.cancelBtn.setOnClickListener {
-            createPickupAndDestinationMarkers()
-        }
-        binding.directionsBtn.setOnClickListener {
-            viewModel.testGoogleApiResponse()
-            supportMapFragment?.getMapAsync { map ->
-                map.addPolyline(
-                    PolylineOptions().add(LatLng(50.270908, 19.039993), LatLng(50.270908, 19.039993), LatLng(52.237049, 21.017532),
-                        LatLng(51.107883, 17.038538)).width(3F).color(Color.RED))
-            }
-        }
+        //testing functions here -> routeLength,cost,time
         binding.drawPolyLine.setOnClickListener {
-            getAndDrawPolyLines()
+            getAndDrawPolylinesAndMarkers()
+            calculateTimeOfArrivalAndChangeText()
+            calculateRouteLengthAndCostAndChangeText()
+
         }
-        binding.imHereBtn.setOnClickListener {
-            viewModel.calculateTimeOfArrival()
-            //        binding.estDestinationArrivalTxt.text = viewModel.timeOfArrival.value
-        }
-            viewModel.timeOfArrival.observe(viewLifecycleOwner){
-                if(it !=null){
-                    binding.estDestinationArrivalTxt.text = it
-                }
-            }
     }
 
+    private fun calculateRouteLengthAndCostAndChangeText() {
+        viewModel.calculateRouteLengthAndCost()
+        viewModel.routeLength.observe(viewLifecycleOwner) {
+            if (it != null) {
+                binding.estRouteLength.text = "Route length: ${String.format("%.1f", it)}km"
+            }
+        }
+        viewModel.estimatedCost.observe(viewLifecycleOwner) {
+            if (it != null) {
+                binding.costTxt.text = "Cost: ${String.format("%.2f",it)}zł"
+            }
+        }
+    }
 
-    private fun createPickupAndDestinationMarkers() {
+    private fun calculateTimeOfArrivalAndChangeText() {
+        viewModel.calculateTimeOfArrival()
+        viewModel.timeOfArrival.observe(viewLifecycleOwner) {
+            if (it != null) {
+                binding.estDestinationArrivalTxt.text = "Estimated time of arrival: $it"
+            }
+        }
+    }
+
+    private fun getAndDrawPolylinesAndMarkers() {
+        // get and draw polylines
+        viewModel.getPolylineLatLngs()
         var position: LatLng
         val latLngBuilder = LatLngBounds.Builder()
         var bounds: LatLngBounds?
-        viewModel.pickupAndDestinationMarkers.observe(viewLifecycleOwner) { markerOptions ->
-            supportMapFragment?.getMapAsync { googleMap ->
-                googleMap.clear()
-                if (markerOptions.isNotEmpty()) {
-                    markerOptions.forEach { marker ->
-                        position = marker.position
-                        latLngBuilder.include(LatLng(position.latitude, position.longitude))
-                        googleMap.addMarker(marker)
-                    }
-                    bounds = latLngBuilder.build()
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds!!, 200))
-                }
-            }
-        }
-
-    }
-
-    private fun getAndDrawPolyLines() {
-        viewModel.getPolylineLatLngs()
         val polyLineLatLngs = viewModel.polyLinesLatLng.value
         val polylineOptions = PolylineOptions()
         supportMapFragment?.getMapAsync { googleMap ->
@@ -120,6 +109,56 @@ class PostOrderFragment : Fragment() {
                 }
             }
             googleMap.addPolyline(polylineOptions.width(5F).color(Color.BLUE))
+            //create destination and pickup markers
+            viewModel.pickupAndDestinationMarkers.observe(viewLifecycleOwner) { markerOptions ->
+                if (markerOptions.isNotEmpty()) {
+                    markerOptions.forEach { marker ->
+                        position = marker.position
+                        latLngBuilder.include(LatLng(position.latitude, position.longitude))
+                        googleMap.addMarker(marker)
+                    }
+                    bounds = latLngBuilder.build()
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds!!, 200))
+                }
+
+            }
+
         }
     }
+
+//    private fun createPickupAndDestinationMarkers() {
+//        var position: LatLng
+//        val latLngBuilder = LatLngBounds.Builder()
+//        var bounds: LatLngBounds?
+//        viewModel.pickupAndDestinationMarkers.observe(viewLifecycleOwner) { markerOptions ->
+//            supportMapFragment?.getMapAsync { googleMap ->
+//                googleMap.clear()
+//                if (markerOptions.isNotEmpty()) {
+//                    markerOptions.forEach { marker ->
+//                        position = marker.position
+//                        latLngBuilder.include(LatLng(position.latitude, position.longitude))
+//                        googleMap.addMarker(marker)
+//                    }
+//                    bounds = latLngBuilder.build()
+//                    googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds!!, 200))
+//                }
+//            }
+//        }
+//
+//    }
+
+//    private fun getAndDrawPolyLines() {
+//        viewModel.getPolylineLatLngs()
+//        val polyLineLatLngs = viewModel.polyLinesLatLng.value
+//        val polylineOptions = PolylineOptions()
+//        supportMapFragment?.getMapAsync { googleMap ->
+//            googleMap.clear()
+//            if (polyLineLatLngs != null) {
+//                for (latLng in polyLineLatLngs) {
+//                    polylineOptions.add(latLng)
+//                }
+//            }
+//            googleMap.addPolyline(polylineOptions.width(5F).color(Color.BLUE))
+//        }
+//    }
 }
