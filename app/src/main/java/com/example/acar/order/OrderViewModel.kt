@@ -60,9 +60,10 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
     val routeLength: LiveData<Double> get() = _routeLength
 
     private var _timeOfArrival = MutableLiveData<String>()
-    val timeOfArrival : LiveData<String> get() = _timeOfArrival
+    val timeOfArrival: LiveData<String> get() = _timeOfArrival
 
-
+    private var _estimatedCost = MutableLiveData<Double>()
+    val estimatedCost: LiveData<Double> get() = _estimatedCost
 
 
     fun getLatLngFromAddresses(geoCoder: Geocoder) {
@@ -96,22 +97,14 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
         _pickupAndDestinationMarkers.value = markers
     }
 
-    fun testGoogleApiResponse() {
-        viewModelScope.launch {
-            val response = async { googleApiRepository.getDirections() }.await()
-            googleApiRepository.setDirectionsResponse(response!!)
-            if (googleApiRepository.directionsResponse.value != null) {
-                Log.d("OrderViewModel", "google api test call " + googleApiRepository.directionsResponse.value!!.string())
-            }
-        }
-    }
     // gets duration in seconds and adds it to the current time -> formats the Calendar into String and sets _timeOfArrival
-    fun calculateTimeOfArrival(){
+    fun calculateTimeOfArrival() {
         viewModelScope.launch {
-            val duration = async { googleApiRepository.getDuration(stringPickupAddress.value!!, stringDestinationAddress.value!!) }.await()
+            val duration =
+                async { googleApiRepository.getDuration(stringPickupAddress.value!!, stringDestinationAddress.value!!) }.await()
             val calendar = Calendar.getInstance()
             calendar.time = Date()
-            Log.d("OrderViewModel","duration in calculateTimeOfArrival" + duration.toString())
+            Log.d("OrderViewModel", "duration in calculateTimeOfArrival" + duration.toString())
             calendar.add(Calendar.SECOND, duration.toInt())
             _timeOfArrival.value = DateFormat.getDateTimeInstance().format(calendar.time)
         }
@@ -131,13 +124,13 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
         _hasResults.postValue(true)
     }
 
-
-    fun calculateEstimatedCost() {
-
-    }
-
-    fun calculateRouteLength() {
-
+    fun calculateRouteLengthAndCost() {
+        viewModelScope.launch {
+            val routeLength =
+                async { googleApiRepository.getRouteLength(stringPickupAddress.value!!, stringDestinationAddress.value!!) }.await()
+            _routeLength.postValue(routeLength / 1000)
+            _estimatedCost.postValue(routeLength.div(1000).times(3))
+        }
     }
 
 }
