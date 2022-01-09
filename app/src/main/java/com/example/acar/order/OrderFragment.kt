@@ -4,9 +4,6 @@ package com.example.acar.order
 import android.Manifest
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.example.acar.databinding.OrderFragmentBinding
 import com.google.android.gms.maps.GoogleMap
@@ -18,6 +15,7 @@ import android.location.Address
 import android.location.Geocoder
 import android.provider.Settings
 import android.util.Log
+import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.ViewModelProvider
@@ -52,15 +50,21 @@ class OrderFragment() : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.orderToolbar.setOnMenuItemClickListener{
+            onOptionsItemSelected(it)
+        }
+
         binding.testNavToPost.setOnClickListener {
             navController.navigate(R.id.action_orderFragment_to_postOrderFragment)
         }
 
+
+
         binding.orderButton.setOnClickListener {
             if (setStringPickupAndDestinationAddress()) {
                 viewModel.getLatLngFromAddresses(geoCoder)
-                viewModel.hasResults.observe(viewLifecycleOwner){hasResults ->
-                    if (!hasResults){
+                viewModel.hasResults.observe(viewLifecycleOwner) { hasResults ->
+                    if (!hasResults) {
                         GlobalToast.showShort(context, "No results")
                         viewModel.doneShowingNoResultsToast()
                     }
@@ -76,12 +80,33 @@ class OrderFragment() : Fragment() {
         }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.logoutItem -> {
+                GlobalToast.showShort(context, "Logout item pressed")
+                true
+            }
+
+            R.id.historyItem -> {
+                GlobalToast.showShort(context, "History item pressed")
+                navController.navigate(R.id.action_orderFragment_to_postOrderFragment)
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        setHasOptionsMenu(true)
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val viewModelFactory = OrderViewModelFactory(googleApiRepository = GoogleApiRepository())
         navController = findNavController()
         val store = navController.getViewModelStoreOwner(R.id.nav_graph_order)
-        viewModel = ViewModelProvider(store,viewModelFactory)[OrderViewModel::class.java]
+        viewModel = ViewModelProvider(store, viewModelFactory)[OrderViewModel::class.java]
         _binding = OrderFragmentBinding.inflate(layoutInflater)
         supportMapFragment = childFragmentManager.findFragmentById(com.example.acar.R.id.map) as SupportMapFragment?
         geoCoder = Geocoder(context)
@@ -110,12 +135,12 @@ class OrderFragment() : Fragment() {
 
     }
 
-    private fun observeAndCreatePolyLines(){
-        viewModel.polyLinesLatLng.observe(viewLifecycleOwner){ polyLineLatLngs ->
-            val polylineOptions = PolylineOptions ()
+    private fun observeAndCreatePolyLines() {
+        viewModel.polyLinesLatLng.observe(viewLifecycleOwner) { polyLineLatLngs ->
+            val polylineOptions = PolylineOptions()
             supportMapFragment?.getMapAsync { googleMap ->
                 if (polyLineLatLngs != null) {
-                    for (latLng in polyLineLatLngs){
+                    for (latLng in polyLineLatLngs) {
                         polylineOptions.add(latLng)
                     }
                 }
@@ -128,7 +153,7 @@ class OrderFragment() : Fragment() {
     private fun setStringPickupAndDestinationAddress(): Boolean {
         val pickupAddress = binding.editTextPickup.text.toString()
         val destinationAddress = binding.editTextDestination.text.toString()
-        if (pickupAddress.isNotEmpty() && destinationAddress.isNotEmpty() && pickupAddress!=destinationAddress) {
+        if (pickupAddress.isNotEmpty() && destinationAddress.isNotEmpty() && pickupAddress != destinationAddress) {
             viewModel.setPickupAndDestinationAddress(pickupAddress, destinationAddress)
             return true
         }
