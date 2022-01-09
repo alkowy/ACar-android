@@ -62,12 +62,12 @@ class PostOrderFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         //testing functions here -> routeLength,cost,time
-        binding.drawPolyLine.setOnClickListener {
+     //   binding.drawPolyLine.setOnClickListener {
             getAndDrawPolylinesAndMarkers()
             calculateTimeOfArrivalAndChangeText()
             calculateRouteLengthAndCostAndChangeText()
 
-        }
+       // }
     }
 
     private fun calculateRouteLengthAndCostAndChangeText() {
