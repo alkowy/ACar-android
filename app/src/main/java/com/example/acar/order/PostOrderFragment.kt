@@ -61,13 +61,10 @@ class PostOrderFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //testing functions here -> routeLength,cost,time
-     //   binding.drawPolyLine.setOnClickListener {
-            getAndDrawPolylinesAndMarkers()
-            calculateTimeOfArrivalAndChangeText()
-            calculateRouteLengthAndCostAndChangeText()
+        calculateTimeOfArrivalAndChangeText()
+        calculateRouteLengthAndCostAndChangeText()
+        getAndDrawPolylinesAndMarkers()
 
-       // }
     }
 
     private fun calculateRouteLengthAndCostAndChangeText() {
@@ -79,7 +76,7 @@ class PostOrderFragment : Fragment() {
         }
         viewModel.estimatedCost.observe(viewLifecycleOwner) {
             if (it != null) {
-                binding.costTxt.text = "Cost: ${String.format("%.2f",it)}zł"
+                binding.costTxt.text = "Cost: ${String.format("%.2f", it)}zł"
             }
         }
     }
@@ -99,66 +96,33 @@ class PostOrderFragment : Fragment() {
         var position: LatLng
         val latLngBuilder = LatLngBounds.Builder()
         var bounds: LatLngBounds?
-        val polyLineLatLngs = viewModel.polyLinesLatLng.value
-        val polylineOptions = PolylineOptions()
-        supportMapFragment?.getMapAsync { googleMap ->
-            googleMap.clear()
-            if (polyLineLatLngs != null) {
-                for (latLng in polyLineLatLngs) {
-                    polylineOptions.add(latLng)
-                }
-            }
-            googleMap.addPolyline(polylineOptions.width(5F).color(Color.BLUE))
-            //create destination and pickup markers
-            viewModel.pickupAndDestinationMarkers.observe(viewLifecycleOwner) { markerOptions ->
-                if (markerOptions.isNotEmpty()) {
-                    markerOptions.forEach { marker ->
-                        position = marker.position
-                        latLngBuilder.include(LatLng(position.latitude, position.longitude))
-                        googleMap.addMarker(marker)
+        viewModel.polyLinesLatLng.observe(viewLifecycleOwner){polyLineLatLngs ->
+            val polylineOptions = PolylineOptions()
+            supportMapFragment?.getMapAsync { googleMap ->
+                googleMap.clear()
+                if (polyLineLatLngs != null) {
+                    for (latLng in polyLineLatLngs) {
+                        polylineOptions.add(latLng)
                     }
-                    bounds = latLngBuilder.build()
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds!!, 200))
+                }
+                googleMap.addPolyline(polylineOptions.width(5F).color(Color.BLUE))
+                //create destination and pickup markers
+                viewModel.pickupAndDestinationMarkers.observe(viewLifecycleOwner) { markerOptions ->
+                    if (markerOptions.isNotEmpty()) {
+                        markerOptions.forEach { marker ->
+                            position = marker.position
+                            latLngBuilder.include(LatLng(position.latitude, position.longitude))
+                            googleMap.addMarker(marker)
+                        }
+                        //bounds = latLngBuilder.include(LatLng(viewModel.pickupLatLng.value!!.latitude, viewModel.pickupLatLng.value!!.longitude)).build()  <- animate to pickup location instead of a whole route
+                        bounds = latLngBuilder.build()
+                        googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds!!, 200))
+                    }
+
                 }
 
             }
-
         }
+
     }
-
-//    private fun createPickupAndDestinationMarkers() {
-//        var position: LatLng
-//        val latLngBuilder = LatLngBounds.Builder()
-//        var bounds: LatLngBounds?
-//        viewModel.pickupAndDestinationMarkers.observe(viewLifecycleOwner) { markerOptions ->
-//            supportMapFragment?.getMapAsync { googleMap ->
-//                googleMap.clear()
-//                if (markerOptions.isNotEmpty()) {
-//                    markerOptions.forEach { marker ->
-//                        position = marker.position
-//                        latLngBuilder.include(LatLng(position.latitude, position.longitude))
-//                        googleMap.addMarker(marker)
-//                    }
-//                    bounds = latLngBuilder.build()
-//                    googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds!!, 200))
-//                }
-//            }
-//        }
-//
-//    }
-
-//    private fun getAndDrawPolyLines() {
-//        viewModel.getPolylineLatLngs()
-//        val polyLineLatLngs = viewModel.polyLinesLatLng.value
-//        val polylineOptions = PolylineOptions()
-//        supportMapFragment?.getMapAsync { googleMap ->
-//            googleMap.clear()
-//            if (polyLineLatLngs != null) {
-//                for (latLng in polyLineLatLngs) {
-//                    polylineOptions.add(latLng)
-//                }
-//            }
-//            googleMap.addPolyline(polylineOptions.width(5F).color(Color.BLUE))
-//        }
-//    }
 }

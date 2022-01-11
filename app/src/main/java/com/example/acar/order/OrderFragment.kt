@@ -14,10 +14,15 @@ import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
 import android.provider.Settings
+import android.text.Html
+import android.text.Spanned
 import android.util.Log
 import android.view.*
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.res.stringResource
+import androidx.constraintlayout.widget.Group
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
@@ -34,6 +39,7 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import dagger.hilt.android.qualifiers.ApplicationContext
+import org.w3c.dom.Text
 import java.io.IOException
 
 
@@ -50,15 +56,9 @@ class OrderFragment() : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.orderToolbar.setOnMenuItemClickListener{
+        binding.orderToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
         }
-
-        binding.testNavToPost.setOnClickListener {
-            navController.navigate(R.id.action_orderFragment_to_postOrderFragment)
-        }
-
-
 
         binding.orderButton.setOnClickListener {
             if (setStringPickupAndDestinationAddress()) {
@@ -68,16 +68,48 @@ class OrderFragment() : Fragment() {
                         GlobalToast.showShort(context, "No results")
                         viewModel.doneShowingNoResultsToast()
                     }
-                }
-                viewModel.destinationLatLng.observe(viewLifecycleOwner) {
-                    if (it != null) {
-                        viewModel.generatePickupAndDestinationMarkers()
+                    else {
+                        viewModel.clearPickupAndDestinationLatLngs()
+                        viewModel.destinationLatLng.observe(viewLifecycleOwner) {
+                            if (it != null && it.latitude != 0.0 ) {
+                                viewModel.generatePickupAndDestinationMarkers()
+                            }
+                        }
+                        createPickupAndDestinationMarkers()
+                        observeAndCreatePolyLines()
+
+                      //  binding.carArriveTextView.visibility = View.VISIBLE
+                        binding.groupCarArrival.visibility = View.VISIBLE
+                        binding.groupInitialViewsOrder.visibility = View.GONE
                     }
                 }
-                createPickupAndDestinationMarkers()
-                observeAndCreatePolyLines()
             }
         }
+        binding.cancelOrderBtn.setOnClickListener {
+            binding.groupCarArrival.visibility = View.GONE
+            binding.groupInitialViewsOrder.visibility = View.VISIBLE
+            // TODO: 10.01.2022  clear map after canceling the order
+        }
+
+
+//        binding.orderButton.setOnClickListener {
+//            if (setStringPickupAndDestinationAddress()) {
+//                viewModel.getLatLngFromAddresses(geoCoder)
+//                viewModel.hasResults.observe(viewLifecycleOwner) { hasResults ->
+//                    if (!hasResults) {
+//                        GlobalToast.showShort(context, "No results")
+//                        viewModel.doneShowingNoResultsToast()
+//                    }
+//                }
+//                viewModel.destinationLatLng.observe(viewLifecycleOwner) {
+//                    if (it != null) {
+//                        viewModel.generatePickupAndDestinationMarkers()
+//                    }
+//                }
+//                createPickupAndDestinationMarkers()
+//                observeAndCreatePolyLines()
+//            }
+//        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -89,7 +121,6 @@ class OrderFragment() : Fragment() {
 
             R.id.historyItem -> {
                 GlobalToast.showShort(context, "History item pressed")
-                navController.navigate(R.id.action_orderFragment_to_postOrderFragment)
                 true
             }
 

@@ -65,6 +65,11 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
     private var _estimatedCost = MutableLiveData<Double>()
     val estimatedCost: LiveData<Double> get() = _estimatedCost
 
+    fun clearPickupAndDestinationLatLngs() {
+        _pickupLatLng.value = LatLng(0.0, 0.0)
+        _destinationLatLng.value = LatLng(0.0, 0.0)
+    }
+
 
     fun getLatLngFromAddresses(geoCoder: Geocoder) {
         viewModelScope.launch {
@@ -118,6 +123,7 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
             }.await()
             _polyLinesLatLng.postValue(polyLinesLatLngs)
         }
+
     }
 
     fun doneShowingNoResultsToast() {
