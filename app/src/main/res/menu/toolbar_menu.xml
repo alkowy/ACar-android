@@ -2,6 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
     <item
         android:id="@+id/historyItem"
         android:title="Orders history"
@@ -10,9 +11,5 @@
         android:id="@+id/logoutItem"
         android:title="Logout"
         app:showAsAction="never"/>
-    <item
-        android:id="@+id/toolbarMenu"
-        android:icon="@drawable/bubble_mask"
-        android:title=""
-        app:showAsAction="always" />
+
 </menu>
