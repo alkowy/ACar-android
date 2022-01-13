@@ -41,6 +41,7 @@ import com.google.android.gms.maps.model.PolylineOptions
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.w3c.dom.Text
 import java.io.IOException
+import java.util.*
 
 
 @AndroidEntryPoint
@@ -73,11 +74,10 @@ class OrderFragment() : Fragment() {
                         viewModel.destinationLatLng.observe(viewLifecycleOwner) {
                             if (it != null && it.latitude != 0.0 ) {
                                 viewModel.generatePickupAndDestinationMarkers()
+                                createPickupAndDestinationMarkers()
+                                observeAndCreatePolyLines()
                             }
                         }
-                        createPickupAndDestinationMarkers()
-                        observeAndCreatePolyLines()
-
                       //  binding.carArriveTextView.visibility = View.VISIBLE
                         binding.groupCarArrival.visibility = View.VISIBLE
                         binding.groupInitialViewsOrder.visibility = View.GONE
@@ -85,9 +85,11 @@ class OrderFragment() : Fragment() {
                 }
             }
         }
+
         binding.cancelOrderBtn.setOnClickListener {
             binding.groupCarArrival.visibility = View.GONE
             binding.groupInitialViewsOrder.visibility = View.VISIBLE
+            viewModel.cancelAllCoroutineJobs()
             // TODO: 10.01.2022  clear map after canceling the order
         }
 
@@ -118,12 +120,10 @@ class OrderFragment() : Fragment() {
                 GlobalToast.showShort(context, "Logout item pressed")
                 true
             }
-
             R.id.historyItem -> {
                 GlobalToast.showShort(context, "History item pressed")
                 true
             }
-
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -163,7 +163,6 @@ class OrderFragment() : Fragment() {
             }
             viewModel.getPolylineLatLngs()
         }
-
     }
 
     private fun observeAndCreatePolyLines() {
@@ -179,7 +178,6 @@ class OrderFragment() : Fragment() {
             }
         }
     }
-
 
     private fun setStringPickupAndDestinationAddress(): Boolean {
         val pickupAddress = binding.editTextPickup.text.toString()

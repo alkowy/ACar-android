@@ -78,17 +78,19 @@ class GoogleApiRepository @Inject constructor() {
             if (response.isSuccessful) {
                 Log.d("googleapirepository", response.body().toString())
                 val routes = response.body()?.routes
-                Log.d("googleapirepository", "overview polyline           " + routes!!.first().overviewPolyline.points.toString())
-                for (route in routes) {
-                    val tempLatLng = PolyUtil.decode(route.overviewPolyline.points)
-                    polyLines.addAll(tempLatLng)
+                if (routes != null) {
+                    Log.d("googleapirepository", "overview polyline           " + routes!!.first().overviewPolyline.points.toString())
+                    for (route in routes) {
+                        val tempLatLng = PolyUtil.decode(route.overviewPolyline.points)
+                        polyLines.addAll(tempLatLng)
+                    }
                 }
-
             }
         }
         Log.d("googleapirepository", "getpolylines        " + polyLines)
         return polyLines
     }
+
     // returns route length in meters
     suspend fun getRouteLength(origin: String, destination: String): Double {
         var routeLength = 0
@@ -100,7 +102,7 @@ class GoogleApiRepository @Inject constructor() {
             if (response.isSuccessful) {
                 val routes = response.body()?.routes
                 for (route in routes!!) {
-                    for(leg in route.legs){
+                    for (leg in route.legs) {
                         routeLength += leg.distance.value
                     }
                 }
