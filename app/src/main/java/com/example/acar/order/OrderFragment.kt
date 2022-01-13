@@ -63,6 +63,7 @@ class OrderFragment() : Fragment() {
 
         binding.orderButton.setOnClickListener {
             if (setStringPickupAndDestinationAddress()) {
+
                 viewModel.getLatLngFromAddresses(geoCoder)
                 viewModel.hasResults.observe(viewLifecycleOwner) { hasResults ->
                     if (!hasResults) {
@@ -70,19 +71,28 @@ class OrderFragment() : Fragment() {
                         viewModel.doneShowingNoResultsToast()
                     }
                     else {
-                        viewModel.clearPickupAndDestinationLatLngs()
-                        viewModel.destinationLatLng.observe(viewLifecycleOwner) {
-                            if (it != null && it.latitude != 0.0 ) {
-                                viewModel.generatePickupAndDestinationMarkers()
-                                createPickupAndDestinationMarkers()
-                                observeAndCreatePolyLines()
+                        viewModel.getDirectionsResponse()
+                        viewModel.directionsResponse.observe(viewLifecycleOwner) { response ->
+                            Log.d("Orderfragment","directionsresponse observed:   " + response.toString())
+                            if (response != null) {
+                                //viewModel.clearPickupAndDestinationLatLngs()
+                                viewModel.destinationLatLng.observe(viewLifecycleOwner) {
+                                    Log.d("Orderfragment","destinationlatlng observed:   " + it.toString())
+
+                                    if (it != null && it.latitude != 0.0) {
+                                        viewModel.generatePickupAndDestinationMarkers()
+                                        createPickupAndDestinationMarkers()
+                                        observeAndCreatePolyLines()
+                                    }
+                                }
+                                //  binding.carArriveTextView.visibility = View.VISIBLEs
+                                binding.groupCarArrival.visibility = View.VISIBLE
+                                binding.groupInitialViewsOrder.visibility = View.GONE
                             }
                         }
-                      //  binding.carArriveTextView.visibility = View.VISIBLE
-                        binding.groupCarArrival.visibility = View.VISIBLE
-                        binding.groupInitialViewsOrder.visibility = View.GONE
                     }
                 }
+
             }
         }
 
@@ -92,26 +102,6 @@ class OrderFragment() : Fragment() {
             viewModel.cancelAllCoroutineJobs()
             // TODO: 10.01.2022  clear map after canceling the order
         }
-
-
-//        binding.orderButton.setOnClickListener {
-//            if (setStringPickupAndDestinationAddress()) {
-//                viewModel.getLatLngFromAddresses(geoCoder)
-//                viewModel.hasResults.observe(viewLifecycleOwner) { hasResults ->
-//                    if (!hasResults) {
-//                        GlobalToast.showShort(context, "No results")
-//                        viewModel.doneShowingNoResultsToast()
-//                    }
-//                }
-//                viewModel.destinationLatLng.observe(viewLifecycleOwner) {
-//                    if (it != null) {
-//                        viewModel.generatePickupAndDestinationMarkers()
-//                    }
-//                }
-//                createPickupAndDestinationMarkers()
-//                observeAndCreatePolyLines()
-//            }
-//        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
