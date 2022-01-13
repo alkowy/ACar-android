@@ -7,9 +7,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.acar.common.GoogleApiRepository
+import com.example.acar.directionsApiModels.DirectionsModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.maps.android.PolyUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import okhttp3.Response
@@ -21,9 +23,7 @@ import javax.inject.Inject
 class OrderViewModel @Inject constructor(private var googleApiRepository: GoogleApiRepository) : ViewModel() {
 
     private lateinit var getLatLngJob: Job
-    private lateinit var calculateTimeJob: Job
-    private lateinit var getPolyLinesJob: Job
-    private lateinit var calculateRouteJob: Job
+    private lateinit var getDirectionsResponseJob: Job
 
     private var _latLngResult = MutableLiveData<LatLng>()
     val latLngResult: LiveData<LatLng> get() = _latLngResult
@@ -63,6 +63,9 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
     private var _estimatedCost = MutableLiveData<Double>()
     val estimatedCost: LiveData<Double> get() = _estimatedCost
 
+    private var _directionsResponse = MutableLiveData<retrofit2.Response<DirectionsModel>>()
+    val directionsResponse: LiveData<retrofit2.Response<DirectionsModel>> get() = _directionsResponse
+
     fun clearPickupAndDestinationLatLngs() {
         _pickupLatLng.value = LatLng(0.0, 0.0)
         _destinationLatLng.value = LatLng(0.0, 0.0)
@@ -74,17 +77,11 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
     }
 
     fun cancelAllCoroutineJobs() {
-        if (this::calculateRouteJob.isInitialized && calculateRouteJob.isActive) {
-            calculateRouteJob.cancel()
-        }
-        if (this::getPolyLinesJob.isInitialized && getPolyLinesJob.isActive) {
-            getPolyLinesJob.cancel()
-        }
-        if (this::calculateTimeJob.isInitialized && calculateTimeJob.isActive) {
-            calculateTimeJob.cancel()
-        }
         if (this::getLatLngJob.isInitialized && getLatLngJob.isActive) {
             getLatLngJob.cancel()
+        }
+        if (this::getDirectionsResponseJob.isInitialized && getDirectionsResponseJob.isActive) {
+            getDirectionsResponseJob.cancel()
         }
     }
 
@@ -118,40 +115,64 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
         _pickupAndDestinationMarkers.value = markers
     }
 
+    fun getDirectionsResponse() {
+        getDirectionsResponseJob = viewModelScope.launch {
+            val directionsResponse = async {
+                googleApiRepository.getDirectionsResponse(stringPickupAddress.value!!, stringDestinationAddress.value!!)
+            }.await()
+            _directionsResponse.postValue(directionsResponse)
+        }
+    }
+
     // gets duration in seconds and adds it to the current time -> formats the Calendar into String and sets _timeOfArrival
     fun calculateTimeOfArrival() {
-        calculateTimeJob = viewModelScope.launch {
-            val duration =
-                async { googleApiRepository.getDuration(stringPickupAddress.value!!, stringDestinationAddress.value!!) }.await()
+        var duration: Long = 0
+        if (_directionsResponse.value != null) {
+            val routes = _directionsResponse.value!!.body()?.routes
+            if (routes != null) {
+                for (route in routes) {
+                    for (leg in route.legs) {
+                        duration += leg.duration.value
+                    }
+                }
+            }
             val calendar = Calendar.getInstance()
             calendar.time = Date()
-            Log.d("OrderViewModel", "duration in calculateTimeOfArrival" + duration.toString())
             calendar.add(Calendar.SECOND, duration.toInt())
             _timeOfArrival.value = DateFormat.getDateTimeInstance().format(calendar.time)
         }
     }
 
-
+    //set list of latlngs to generate polyline on the map
     fun getPolylineLatLngs() {
-        getPolyLinesJob = viewModelScope.launch {
-            val polyLinesLatLngs = async {
-                googleApiRepository.getPolyLines(stringPickupAddress.value!!, stringDestinationAddress.value!!)
-            }.await()
-            _polyLinesLatLng.postValue(polyLinesLatLngs)
+        val polyLines = mutableListOf<LatLng>()
+        if (_directionsResponse.value != null) {
+            val routes = _directionsResponse.value!!.body()?.routes
+            if (routes != null) {
+                for (route in routes) {
+                    val tempLatLng = PolyUtil.decode(route.overviewPolyline.points)
+                    polyLines.addAll(tempLatLng)
+                }
+            }
         }
+        _polyLinesLatLng.postValue(polyLines)
     }
-
     fun doneShowingNoResultsToast() {
         _hasResults.postValue(true)
     }
 
+    // set route length in meters + cost 3zl per 1km
     fun calculateRouteLengthAndCost() {
-        calculateRouteJob = viewModelScope.launch {
-            val routeLength =
-                async { googleApiRepository.getRouteLength(stringPickupAddress.value!!, stringDestinationAddress.value!!) }.await()
-            _routeLength.postValue(routeLength / 1000)
-            _estimatedCost.postValue(routeLength.div(1000).times(3))
+        var routeLength = 0
+        val routes = _directionsResponse.value!!.body()?.routes
+        for (route in routes!!) {
+            for (leg in route.legs) {
+                routeLength += leg.distance.value
+            }
         }
+        _routeLength.postValue(routeLength.toDouble() / 1000)
+        _estimatedCost.postValue(routeLength.toDouble().div(1000).times(3))
     }
 }
+
 
