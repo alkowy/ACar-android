@@ -41,6 +41,7 @@ import com.google.android.gms.maps.model.PolylineOptions
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.w3c.dom.Text
 import java.io.IOException
+import java.text.DateFormat
 import java.util.*
 
 
@@ -63,7 +64,6 @@ class OrderFragment() : Fragment() {
 
         binding.orderButton.setOnClickListener {
             if (setStringPickupAndDestinationAddress()) {
-
                 viewModel.getLatLngFromAddresses(geoCoder)
                 viewModel.hasResults.observe(viewLifecycleOwner) { hasResults ->
                     if (!hasResults) {
@@ -73,26 +73,22 @@ class OrderFragment() : Fragment() {
                     else {
                         viewModel.getDirectionsResponse()
                         viewModel.directionsResponse.observe(viewLifecycleOwner) { response ->
-                            Log.d("Orderfragment","directionsresponse observed:   " + response.toString())
                             if (response != null) {
                                 //viewModel.clearPickupAndDestinationLatLngs()
                                 viewModel.destinationLatLng.observe(viewLifecycleOwner) {
-                                    Log.d("Orderfragment","destinationlatlng observed:   " + it.toString())
-
                                     if (it != null && it.latitude != 0.0) {
                                         viewModel.generatePickupAndDestinationMarkers()
                                         createPickupAndDestinationMarkers()
                                         observeAndCreatePolyLines()
                                     }
                                 }
-                                //  binding.carArriveTextView.visibility = View.VISIBLEs
-                                binding.groupCarArrival.visibility = View.VISIBLE
                                 binding.groupInitialViewsOrder.visibility = View.GONE
+                                binding.groupCarArrival.visibility = View.VISIBLE
+                                setCarArrivalTime()
                             }
                         }
                     }
                 }
-
             }
         }
 
@@ -100,8 +96,22 @@ class OrderFragment() : Fragment() {
             binding.groupCarArrival.visibility = View.GONE
             binding.groupInitialViewsOrder.visibility = View.VISIBLE
             viewModel.cancelAllCoroutineJobs()
-            // TODO: 10.01.2022  clear map after canceling the order
+            supportMapFragment?.getMapAsync { googleMap ->
+                googleMap.clear()
+            }
+            GlobalToast.showShort(context, "You've cancelled your order")
         }
+        binding.carIsHereBtm.setOnClickListener {
+            navController.navigate(R.id.action_orderFragment_to_postOrderFragment)
+        }
+    }
+
+    // sets the textview to current time +5min
+    private fun setCarArrivalTime() {
+        val calendar = Calendar.getInstance()
+        calendar.time = Date()
+        calendar.add(Calendar.SECOND, 500)
+        binding.timeOfCarArrival.text = DateFormat.getDateTimeInstance().format(calendar.time)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
