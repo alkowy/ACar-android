@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.PolylineOptions
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import android.R.attr.delay
+import android.app.AlertDialog
 import android.os.Build
 import android.text.format.DateFormat
 import android.text.format.Time
@@ -65,7 +66,22 @@ class PostOrderFragment : Fragment() {
         calculateRouteLengthAndCostAndChangeText()
         getAndDrawPolylinesAndMarkers()
 
+        binding.hereBtn.setOnClickListener {
+            displayThankYouAlertDialogAndNavigateBackToOrderFragment()
+        }
+
     }
+
+    private fun displayThankYouAlertDialogAndNavigateBackToOrderFragment() {
+        AlertDialog
+                .Builder(context)
+                .setTitle("Ride finished")
+                .setMessage("Thank you for using our service! :)")
+                .setIcon(android.R.drawable.sym_def_app_icon)
+                .setOnCancelListener { navController.navigate(R.id.action_postOrderFragment_to_orderFragment) }
+                .show()
+    }
+
 
     private fun calculateRouteLengthAndCostAndChangeText() {
         viewModel.calculateRouteLengthAndCost()
@@ -96,7 +112,7 @@ class PostOrderFragment : Fragment() {
         var position: LatLng
         val latLngBuilder = LatLngBounds.Builder()
         var bounds: LatLngBounds?
-        viewModel.polyLinesLatLng.observe(viewLifecycleOwner){polyLineLatLngs ->
+        viewModel.polyLinesLatLng.observe(viewLifecycleOwner) { polyLineLatLngs ->
             val polylineOptions = PolylineOptions()
             supportMapFragment?.getMapAsync { googleMap ->
                 googleMap.clear()
@@ -105,7 +121,9 @@ class PostOrderFragment : Fragment() {
                         polylineOptions.add(latLng)
                     }
                 }
-                googleMap.addPolyline(polylineOptions.width(5F).color(Color.BLUE))
+                googleMap.addPolyline(polylineOptions
+                        .width(5F)
+                        .color(Color.BLUE))
                 //create destination and pickup markers
                 viewModel.pickupAndDestinationMarkers.observe(viewLifecycleOwner) { markerOptions ->
                     if (markerOptions.isNotEmpty()) {
