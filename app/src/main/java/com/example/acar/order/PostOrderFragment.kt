@@ -68,6 +68,7 @@ class PostOrderFragment : Fragment() {
 
         binding.hereBtn.setOnClickListener {
             displayThankYouAlertDialogAndNavigateBackToOrderFragment()
+            viewModel.addRideToHistory()
         }
 
     }

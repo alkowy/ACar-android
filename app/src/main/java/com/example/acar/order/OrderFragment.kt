@@ -112,6 +112,7 @@ class OrderFragment() : Fragment() {
         calendar.time = Date()
         calendar.add(Calendar.SECOND, 500)
         binding.timeOfCarArrival.text = DateFormat.getDateTimeInstance().format(calendar.time)
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -122,6 +123,7 @@ class OrderFragment() : Fragment() {
             }
             R.id.historyItem -> {
                 GlobalToast.showShort(context, "History item pressed")
+                navController.navigate(R.id.action_orderFragment_to_historyFragment)
                 true
             }
             else -> super.onOptionsItemSelected(item)

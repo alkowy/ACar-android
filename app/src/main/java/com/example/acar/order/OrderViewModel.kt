@@ -8,16 +8,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.acar.common.GoogleApiRepository
 import com.example.acar.directionsApiModels.DirectionsModel
+import com.example.acar.ordersHistory.RideHistoryItem
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.maps.android.PolyUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
-import okhttp3.Response
 import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 @HiltViewModel
 class OrderViewModel @Inject constructor(private var googleApiRepository: GoogleApiRepository) : ViewModel() {
@@ -54,6 +55,9 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
     private var _polyLinesLatLng = MutableLiveData<List<LatLng>>()
     val polyLinesLatLng: LiveData<List<LatLng>> get() = _polyLinesLatLng
 
+    private var _polyLinesOverview = MutableLiveData<String>()
+    val polyLinesOverview: LiveData<String> get() = _polyLinesOverview
+
     private var _routeLength = MutableLiveData<Double>()
     val routeLength: LiveData<Double> get() = _routeLength
 
@@ -66,6 +70,9 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
     private var _directionsResponse = MutableLiveData<retrofit2.Response<DirectionsModel>>()
     val directionsResponse: LiveData<retrofit2.Response<DirectionsModel>> get() = _directionsResponse
 
+    private var _listOfRidesHistory = MutableLiveData<ArrayList<RideHistoryItem>>()
+    val listOfRidesHistory: LiveData<ArrayList<RideHistoryItem>> get() = _listOfRidesHistory
+
     fun clearPickupAndDestinationLatLngs() {
         _pickupLatLng.value = LatLng(0.0, 0.0)
         _destinationLatLng.value = LatLng(0.0, 0.0)
@@ -74,6 +81,30 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
     fun doneMarkingAddress() {
         _stringPickupAddress.value = ""
         _stringDestinationAddress.value = ""
+    }
+
+    fun addRideToHistory() {
+        val date = Calendar.getInstance().time
+        val formatter = SimpleDateFormat.getDateInstance()
+        val formattedDate = formatter.format(date)
+
+        val ride =
+            RideHistoryItem(formattedDate, stringPickupAddress.value!!, stringDestinationAddress.value!!, polyLinesOverview.value!!,
+                pickupAndDestinationMarkers.value!!)
+        var tempListOfRides = mutableListOf<RideHistoryItem>(ride)
+        if (_listOfRidesHistory.value == null) {
+            _listOfRidesHistory.value=(tempListOfRides as ArrayList<RideHistoryItem>)
+
+        }
+        else {
+            tempListOfRides = _listOfRidesHistory.value!!
+            tempListOfRides.add(ride)
+            _listOfRidesHistory.value=(tempListOfRides as ArrayList<RideHistoryItem>)
+        }
+        _listOfRidesHistory.value=(tempListOfRides as ArrayList<RideHistoryItem>?)
+        Log.d("orderviewmodel addridetohistory:", _listOfRidesHistory.value.toString())
+        Log.d("orderviewmodel addridetohistory:", ride.toString())
+
     }
 
     fun cancelAllCoroutineJobs() {
@@ -113,6 +144,7 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
         markers.add(pickupMarker)
         markers.add(destinationMarker)
         _pickupAndDestinationMarkers.value = markers
+        Log.d("orderviewmodel markers here:", markers.toString())
     }
 
     fun getDirectionsResponse() {
@@ -139,24 +171,32 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
             val calendar = Calendar.getInstance()
             calendar.time = Date()
             calendar.add(Calendar.SECOND, duration.toInt())
-            _timeOfArrival.value = DateFormat.getDateTimeInstance().format(calendar.time)
+            _timeOfArrival.value = DateFormat
+                    .getDateTimeInstance()
+                    .format(calendar.time)
         }
     }
 
     //set list of latlngs to generate polyline on the map
     fun getPolylineLatLngs() {
         val polyLines = mutableListOf<LatLng>()
+        var polyLineOverView: String = ""
         if (_directionsResponse.value != null) {
             val routes = _directionsResponse.value!!.body()?.routes
             if (routes != null) {
                 for (route in routes) {
                     val tempLatLng = PolyUtil.decode(route.overviewPolyline.points)
                     polyLines.addAll(tempLatLng)
+                    route.overviewPolyline.points
+                    polyLineOverView = route.overviewPolyline.points
                 }
             }
         }
+        _polyLinesOverview.postValue(polyLineOverView)
         _polyLinesLatLng.postValue(polyLines)
+        Log.d("orderviewmodel polylines here:", polyLines.toString())
     }
+
     fun doneShowingNoResultsToast() {
         _hasResults.postValue(true)
     }
@@ -171,7 +211,10 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
             }
         }
         _routeLength.postValue(routeLength.toDouble() / 1000)
-        _estimatedCost.postValue(routeLength.toDouble().div(1000).times(3))
+        _estimatedCost.postValue(routeLength
+                .toDouble()
+                .div(1000)
+                .times(3))
     }
 }
 
