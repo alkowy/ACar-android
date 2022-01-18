@@ -90,7 +90,7 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
 
         val ride =
             RideHistoryItem(formattedDate, stringPickupAddress.value!!, stringDestinationAddress.value!!, polyLinesOverview.value!!,
-                pickupAndDestinationMarkers.value!!)
+                pickupLatLng.value!!, destinationLatLng.value!!)
         var tempListOfRides = mutableListOf<RideHistoryItem>(ride)
         if (_listOfRidesHistory.value == null) {
             _listOfRidesHistory.value=(tempListOfRides as ArrayList<RideHistoryItem>)
