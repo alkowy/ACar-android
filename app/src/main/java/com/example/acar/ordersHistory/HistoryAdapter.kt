@@ -47,16 +47,12 @@ class HistoryAdapter(private val historyOfRides: ArrayList<RideHistoryItem>, pri
             val baseGoogleUrl =
                 "https://maps.googleapis.com/maps/api/staticmap?size=400x200&markes=&path=weight:3|color:blue|enc:"
             val formattedUrl = baseGoogleUrl + encodedPolyLine.replace("\\\\", "\\") + "&key=" + BuildConfig.MAPS_API_KEY
-
-            Log.d("HistoryAdapter formattedurl:", formattedUrl)
-            Glide
+                  Glide
                     .with(itemBinding.root)
                     .load(formattedUrl)
                     .centerInside()
                     .into(itemBinding.mapImage)
-
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
