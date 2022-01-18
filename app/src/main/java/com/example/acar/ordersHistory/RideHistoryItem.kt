@@ -3,7 +3,7 @@ package com.example.acar.ordersHistory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 
-data class RideHistoryItem(var date : String, var pickup: String, var destination: String, var polyLineOverview : String, var mapMarkers :List<MarkerOptions>)
+data class RideHistoryItem(var date : String, var pickup: String, var destination: String, var polyLineOverview : String, var pickupLatLng : LatLng, var destinationLatLng : LatLng)
 //https://developers.google.com/maps/documentation/maps-static/start#Markers
 //https://maps.googleapis.com/maps/api/staticmap
 //?size=400x400&center=59.900503,-135.478011&zoom=4
