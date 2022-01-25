@@ -6,6 +6,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.acar.common.AppModule
+import com.example.acar.common.AuthRepository
+import com.example.acar.common.DataBaseRepository
 import com.example.acar.common.GoogleApiRepository
 import com.example.acar.directionsApiModels.DirectionsModel
 import com.example.acar.ordersHistory.RideHistoryItem
@@ -21,7 +24,9 @@ import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 @HiltViewModel
-class OrderViewModel @Inject constructor(private var googleApiRepository: GoogleApiRepository) : ViewModel() {
+class OrderViewModel @Inject constructor(private var googleApiRepository: GoogleApiRepository, private val authRepository: AuthRepository) : ViewModel() {
+
+    private val dbRepo = DataBaseRepository(AppModule.provideFireBaseDBRepo())
 
     private lateinit var getLatLngJob: Job
     private lateinit var getDirectionsResponseJob: Job
@@ -104,6 +109,10 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
         _listOfRidesHistory.value=(tempListOfRides as ArrayList<RideHistoryItem>?)
         Log.d("orderviewmodel addridetohistory:", _listOfRidesHistory.value.toString())
         Log.d("orderviewmodel addridetohistory:", ride.toString())
+        dbRepo.addRideToTheHistoryDb(authRepository.currentLoggedInUser.value!!.uid, ride)
+        viewModelScope.launch {
+            dbRepo.getRidesHistory(authRepository.currentLoggedInUser.value!!.uid)
+        }
 
     }
 
