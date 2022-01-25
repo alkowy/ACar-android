@@ -28,9 +28,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
 import com.example.acar.R
-import com.example.acar.common.AppModule
-import com.example.acar.common.GlobalToast
-import com.example.acar.common.GoogleApiRepository
+import com.example.acar.common.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -38,6 +36,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.w3c.dom.Text
 import java.io.IOException
@@ -111,7 +110,9 @@ class OrderFragment() : Fragment() {
         val calendar = Calendar.getInstance()
         calendar.time = Date()
         calendar.add(Calendar.SECOND, 500)
-        binding.timeOfCarArrival.text = DateFormat.getDateTimeInstance().format(calendar.time)
+        binding.timeOfCarArrival.text = DateFormat
+                .getDateTimeInstance()
+                .format(calendar.time)
 
     }
 
@@ -136,7 +137,9 @@ class OrderFragment() : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val viewModelFactory = OrderViewModelFactory(googleApiRepository = GoogleApiRepository())
+        val viewModelFactory = OrderViewModelFactory(googleApiRepository = GoogleApiRepository(),
+            authRepository = AuthRepository(fAuth = AppModule.provideAuthRepo(),
+                DataBaseRepository(AppModule.provideFireBaseDBRepo())))
         navController = findNavController()
         val store = navController.getViewModelStoreOwner(R.id.nav_graph_order)
         viewModel = ViewModelProvider(store, viewModelFactory)[OrderViewModel::class.java]
@@ -176,7 +179,9 @@ class OrderFragment() : Fragment() {
                         polylineOptions.add(latLng)
                     }
                 }
-                googleMap.addPolyline(polylineOptions.width(5F).color(Color.BLUE))
+                googleMap.addPolyline(polylineOptions
+                        .width(5F)
+                        .color(Color.BLUE))
             }
         }
     }

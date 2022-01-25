@@ -33,6 +33,9 @@ import android.text.format.DateFormat
 import android.text.format.Time
 import androidx.annotation.RequiresApi
 import androidx.appcompat.widget.ViewUtils
+import com.example.acar.common.AppModule
+import com.example.acar.common.AuthRepository
+import com.example.acar.common.DataBaseRepository
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -49,7 +52,9 @@ class PostOrderFragment : Fragment() {
     private lateinit var navController: NavController
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val viewModelFactory = OrderViewModelFactory(googleApiRepository = GoogleApiRepository())
+        val viewModelFactory = OrderViewModelFactory(googleApiRepository = GoogleApiRepository(),
+            authRepository = AuthRepository(fAuth = AppModule.provideAuthRepo(),
+                DataBaseRepository(AppModule.provideFireBaseDBRepo())))
         navController = findNavController()
         val store = navController.getViewModelStoreOwner(R.id.nav_graph_order)
         viewModel = ViewModelProvider(store, viewModelFactory)[OrderViewModel::class.java]
@@ -74,13 +79,12 @@ class PostOrderFragment : Fragment() {
     }
 
     private fun displayThankYouAlertDialogAndNavigateBackToOrderFragment() {
-        AlertDialog
-                .Builder(context)
-                .setTitle("Ride finished")
-                .setMessage("Thank you for using our service! :)")
-                .setIcon(android.R.drawable.sym_def_app_icon)
-                .setOnCancelListener { navController.navigate(R.id.action_postOrderFragment_to_orderFragment) }
-                .show()
+        AlertDialog.Builder(context)
+            .setTitle("Ride finished")
+            .setMessage("Thank you for using our service! :)")
+            .setIcon(android.R.drawable.sym_def_app_icon)
+            .setOnCancelListener { navController.navigate(R.id.action_postOrderFragment_to_orderFragment) }
+            .show()
     }
 
 
@@ -122,9 +126,7 @@ class PostOrderFragment : Fragment() {
                         polylineOptions.add(latLng)
                     }
                 }
-                googleMap.addPolyline(polylineOptions
-                        .width(5F)
-                        .color(Color.BLUE))
+                googleMap.addPolyline(polylineOptions.width(5F).color(Color.BLUE))
                 //create destination and pickup markers
                 viewModel.pickupAndDestinationMarkers.observe(viewLifecycleOwner) { markerOptions ->
                     if (markerOptions.isNotEmpty()) {

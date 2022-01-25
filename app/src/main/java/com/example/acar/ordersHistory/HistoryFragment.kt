@@ -12,6 +12,9 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.acar.R
+import com.example.acar.common.AppModule
+import com.example.acar.common.AuthRepository
+import com.example.acar.common.DataBaseRepository
 import com.example.acar.common.GoogleApiRepository
 import com.example.acar.databinding.HistoryFragmentBinding
 import com.example.acar.databinding.OrderFragmentBinding
@@ -29,7 +32,9 @@ class HistoryFragment : Fragment() {
     private lateinit var ridesHistoryAdapter: HistoryAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val viewModelFactory = OrderViewModelFactory(googleApiRepository = GoogleApiRepository())
+        val viewModelFactory = OrderViewModelFactory(googleApiRepository = GoogleApiRepository(),
+            authRepository = AuthRepository(fAuth = AppModule.provideAuthRepo(),
+                DataBaseRepository(AppModule.provideFireBaseDBRepo())))
         navController = findNavController()
         val store = navController.getViewModelStoreOwner(R.id.nav_graph_order)
         viewModel = ViewModelProvider(store, viewModelFactory)[OrderViewModel::class.java]
