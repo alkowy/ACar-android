@@ -69,11 +69,12 @@ class OrderFragment() : Fragment() {
                         GlobalToast.showShort(context, "No results")
                         viewModel.doneShowingNoResultsToast()
                     }
-                    else {
+                    else if(hasResults){
+
                         viewModel.getDirectionsResponse()
                         viewModel.directionsResponse.observe(viewLifecycleOwner) { response ->
                             if (response != null) {
-                                //viewModel.clearPickupAndDestinationLatLngs()
+                                viewModel.clearPickupAndDestinationLatLngs()
                                 viewModel.destinationLatLng.observe(viewLifecycleOwner) {
                                     if (it != null && it.latitude != 0.0) {
                                         viewModel.generatePickupAndDestinationMarkers()
@@ -146,6 +147,7 @@ class OrderFragment() : Fragment() {
         _binding = OrderFragmentBinding.inflate(layoutInflater)
         supportMapFragment = childFragmentManager.findFragmentById(com.example.acar.R.id.map) as SupportMapFragment?
         geoCoder = Geocoder(context)
+        viewModel.getAllHistoryRidesFromDb()
         return binding.root
     }
 

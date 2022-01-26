@@ -6,6 +6,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.type.LatLng
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,38 +18,33 @@ class DataBaseRepository @Inject constructor(val firebaseDatabase: FirebaseFires
         firebaseDatabase.collection("users").document(userId).collection("ridesHistory").add(ride)
     }
 
-    suspend fun getRidesHistory(userId: String) {
+    suspend fun getRidesHistory(userId: String): ArrayList<RideHistoryItem> {
         return withContext(Dispatchers.IO) {
             val historyOfRides = arrayListOf<RideHistoryItem>()
             val docRef = firebaseDatabase.collection("users").document(userId).collection("ridesHistory")
-            docRef.get().addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val document = task.result
-                    document.let { ride ->
-                        ride.forEach {
+            val documents = docRef.get().await()
+            documents.let { ride ->
+                ride.forEach {
+                    val date = it.get("date").toString()
+                    val destination = it.get("destination").toString()
+                    val pickup = it.get("pickup").toString()
+                    val polylineOverview = it.get("polyLineOverview").toString()
+                    val destinationLatLngHashMap = it.get("destinationLatLng") as HashMap<String, String>
+                    val destinationLatitude = destinationLatLngHashMap["latitude"].toString().toDouble()
+                    val destinationLongitude = destinationLatLngHashMap["longitude"].toString().toDouble()
+                    val destinationLatLng = com.google.android.gms.maps.model.LatLng(destinationLatitude, destinationLongitude)
 
-                            val date = it.get("date").toString()
-                            val destination = it.get("destination").toString()
-                            val pickup = it.get("pickup").toString()
-                            val polylineOverview = it.get("polyLineOverview").toString()
-                            val destinationLatLngHashMap = it.get("destinationLatLng") as HashMap<String, String>
-                            val destinationLatitude = destinationLatLngHashMap["latitude"].toString().toDouble()
-                            val destinationLongitude = destinationLatLngHashMap["longitude"].toString().toDouble()
-                            val destinationLatLng = com.google.android.gms.maps.model.LatLng(destinationLatitude, destinationLongitude)
-
-                            val pickupLatLngHashMap = it.get("pickupLatLng") as HashMap<String, String>
-                            val pickupLatitude = pickupLatLngHashMap["latitude"].toString().toDouble()
-                            val pickupLongitude = pickupLatLngHashMap["longitude"].toString().toDouble()
-                            val pickupLatLng = com.google.android.gms.maps.model.LatLng(pickupLatitude, pickupLongitude)
-                            val ride = RideHistoryItem(date, pickup, destination, polylineOverview, pickupLatLng, destinationLatLng)
-                            Log.d("DatabaseRepository ride", ride.toString())
-                            historyOfRides.add(ride)
-                        }
-                    }
+                    val pickupLatLngHashMap = it.get("pickupLatLng") as HashMap<String, String>
+                    val pickupLatitude = pickupLatLngHashMap["latitude"].toString().toDouble()
+                    val pickupLongitude = pickupLatLngHashMap["longitude"].toString().toDouble()
+                    val pickupLatLng = com.google.android.gms.maps.model.LatLng(pickupLatitude, pickupLongitude)
+                    val ride = RideHistoryItem(date, pickup, destination, polylineOverview, pickupLatLng, destinationLatLng)
+                    Log.d("DatabaseRepository ride", ride.toString())
+                    historyOfRides.add(ride)
                 }
-                historyOfRides
-                Log.d("DatabaseRepository historyofrides1", historyOfRides.toString())
             }
+            Log.d("DatabaseRepository rides", historyOfRides.toString())
+            historyOfRides
         }
     }
 }

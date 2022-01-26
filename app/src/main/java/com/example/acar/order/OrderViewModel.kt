@@ -24,7 +24,8 @@ import javax.inject.Inject
 import kotlin.collections.ArrayList
 
 @HiltViewModel
-class OrderViewModel @Inject constructor(private var googleApiRepository: GoogleApiRepository, private val authRepository: AuthRepository) : ViewModel() {
+class OrderViewModel @Inject constructor(private var googleApiRepository: GoogleApiRepository,
+                                         private val authRepository: AuthRepository) : ViewModel() {
 
     private val dbRepo = DataBaseRepository(AppModule.provideFireBaseDBRepo())
 
@@ -98,22 +99,26 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
                 pickupLatLng.value!!, destinationLatLng.value!!)
         var tempListOfRides = mutableListOf<RideHistoryItem>(ride)
         if (_listOfRidesHistory.value == null) {
-            _listOfRidesHistory.value=(tempListOfRides as ArrayList<RideHistoryItem>)
+            _listOfRidesHistory.value = (tempListOfRides as ArrayList<RideHistoryItem>)
 
         }
         else {
             tempListOfRides = _listOfRidesHistory.value!!
             tempListOfRides.add(ride)
-            _listOfRidesHistory.value=(tempListOfRides as ArrayList<RideHistoryItem>)
+            _listOfRidesHistory.value = (tempListOfRides as ArrayList<RideHistoryItem>)
         }
-        _listOfRidesHistory.value=(tempListOfRides as ArrayList<RideHistoryItem>?)
+        _listOfRidesHistory.value = (tempListOfRides as ArrayList<RideHistoryItem>?)
         Log.d("orderviewmodel addridetohistory:", _listOfRidesHistory.value.toString())
         Log.d("orderviewmodel addridetohistory:", ride.toString())
         dbRepo.addRideToTheHistoryDb(authRepository.currentLoggedInUser.value!!.uid, ride)
-        viewModelScope.launch {
-            dbRepo.getRidesHistory(authRepository.currentLoggedInUser.value!!.uid)
-        }
+    }
 
+    fun getAllHistoryRidesFromDb() {
+        viewModelScope.launch {
+            val allHistoryRides = dbRepo.getRidesHistory(authRepository.currentLoggedInUser.value!!.uid)
+            allHistoryRides.sortByDescending { it.date }
+            _listOfRidesHistory.value = allHistoryRides
+        }
     }
 
     fun cancelAllCoroutineJobs() {
@@ -139,6 +144,7 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
                 val destinationLocation = destinationAddress[0]
                 _pickupLatLng.value = LatLng(pickupLocation.latitude, pickupLocation.longitude)
                 _destinationLatLng.value = LatLng(destinationLocation.latitude, destinationLocation.longitude)
+                Log.d("orderviewmodel pickupaddressnoresults: ", pickupLocation.toString())
             }
             else {
                 _hasResults.value = false
@@ -180,9 +186,7 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
             val calendar = Calendar.getInstance()
             calendar.time = Date()
             calendar.add(Calendar.SECOND, duration.toInt())
-            _timeOfArrival.value = DateFormat
-                    .getDateTimeInstance()
-                    .format(calendar.time)
+            _timeOfArrival.value = DateFormat.getDateTimeInstance().format(calendar.time)
         }
     }
 
@@ -220,10 +224,7 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
             }
         }
         _routeLength.postValue(routeLength.toDouble() / 1000)
-        _estimatedCost.postValue(routeLength
-                .toDouble()
-                .div(1000)
-                .times(3))
+        _estimatedCost.postValue(routeLength.toDouble().div(1000).times(3))
     }
 }
 

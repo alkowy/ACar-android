@@ -32,6 +32,7 @@ class HistoryAdapter(private val historyOfRides: ArrayList<RideHistoryItem>, pri
     }
 
     inner class ViewHolder(private val itemBinding: ItemHistoryOrderBinding) : RecyclerView.ViewHolder(itemBinding.root) {
+        val API_KEY = BuildConfig.MAPS_API_KEY
         fun bind(ride: RideHistoryItem) {
             itemBinding.dateTv.text = ride.date
             itemBinding.pickupTv.text = ride.pickup
@@ -46,7 +47,7 @@ class HistoryAdapter(private val historyOfRides: ArrayList<RideHistoryItem>, pri
             val encodedPolyLine = ride.polyLineOverview
             val baseGoogleUrl =
                 "https://maps.googleapis.com/maps/api/staticmap?size=400x200&markes=&path=weight:3|color:blue|enc:"
-            val formattedUrl = baseGoogleUrl + encodedPolyLine.replace("\\\\", "\\") + "&key=" + BuildConfig.MAPS_API_KEY
+            val formattedUrl = baseGoogleUrl + encodedPolyLine.replace("\\\\", "\\") + "&key=" + API_KEY
                   Glide
                     .with(itemBinding.root)
                     .load(formattedUrl)
