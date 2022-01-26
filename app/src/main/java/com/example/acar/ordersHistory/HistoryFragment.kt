@@ -51,10 +51,6 @@ class HistoryFragment : Fragment() {
         rvRides.adapter = ridesHistoryAdapter
         rvRides.layoutManager = LinearLayoutManager(context)
 
-
         ridesHistoryAdapter.submitList(rides)
-
-
-
     }
 }
