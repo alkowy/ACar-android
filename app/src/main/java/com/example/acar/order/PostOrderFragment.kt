@@ -71,11 +71,14 @@ class PostOrderFragment : Fragment() {
         calculateRouteLengthAndCostAndChangeText()
         getAndDrawPolylinesAndMarkers()
 
+        hereBtnOnClick()
+    }
+
+    private fun hereBtnOnClick() {
         binding.hereBtn.setOnClickListener {
             displayThankYouAlertDialogAndNavigateBackToOrderFragment()
             viewModel.addRideToHistory()
         }
-
     }
 
     private fun displayThankYouAlertDialogAndNavigateBackToOrderFragment() {

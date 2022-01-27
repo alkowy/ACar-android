@@ -30,6 +30,7 @@ class HistoryFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var navController: NavController
     private lateinit var ridesHistoryAdapter: HistoryAdapter
+    private  lateinit var rides : ArrayList<RideHistoryItem>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val viewModelFactory = OrderViewModelFactory(googleApiRepository = GoogleApiRepository(),
@@ -39,18 +40,29 @@ class HistoryFragment : Fragment() {
         val store = navController.getViewModelStoreOwner(R.id.nav_graph_order)
         viewModel = ViewModelProvider(store, viewModelFactory)[OrderViewModel::class.java]
         _binding = HistoryFragmentBinding.inflate(layoutInflater)
+        binding.historyToolbar.let {
+            it.setNavigationIcon(R.drawable.common_google_signin_btn_icon_dark)
+            it.setNavigationOnClickListener { navController.navigate(R.id.action_historyFragment_to_orderFragment) }
+        }
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val rides = viewModel.listOfRidesHistory.value
+
+        observeListOfRidesHistory()
 
         val rvRides = binding.ridesRv
-        ridesHistoryAdapter = HistoryAdapter(rides!!,viewModel)
+        ridesHistoryAdapter = HistoryAdapter(rides)
         rvRides.adapter = ridesHistoryAdapter
         rvRides.layoutManager = LinearLayoutManager(context)
 
-        ridesHistoryAdapter.submitList(rides)
+    }
+
+    private fun observeListOfRidesHistory() {
+        rides = arrayListOf()
+        viewModel.listOfRidesHistory.observe(viewLifecycleOwner) {
+            ridesHistoryAdapter.submitList(it)
+        }
     }
 }

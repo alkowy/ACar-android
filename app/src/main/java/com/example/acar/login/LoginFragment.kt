@@ -29,9 +29,6 @@ class LoginFragment : Fragment() {
         onClickLoginButton()
         observeLoginStatus()
         fakeLogin()
-
-
-
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
