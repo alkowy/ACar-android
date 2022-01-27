@@ -20,34 +20,40 @@
 
     <EditText
         android:id="@+id/editTextPickup"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
         android:ems="10"
         android:hint="Pickup location"
         android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/map" />
 
     <Button
         android:id="@+id/orderButton"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:text="order"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextDestination"
-        app:layout_constraintStart_toEndOf="@+id/editTextPickup" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextDestination" />
 
     <EditText
         android:id="@+id/editTextDestination"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
         android:ems="10"
         android:hint="Destination"
         android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextPickup" />
 
@@ -99,7 +105,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="24dp"
-        android:text="@android:string/cancel"
+        android:text="Cancel"
         android:visibility="gone"
         tools:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"

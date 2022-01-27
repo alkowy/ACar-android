@@ -57,11 +57,39 @@ class OrderFragment() : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setToolbarOnMenuClickListener()
+        orderBtnOnClick()
+        cancelBtnOnClick()
+        carHereBtnOnClick()
+    }
+
+    private fun setToolbarOnMenuClickListener() {
         binding.orderToolbar.setOnMenuItemClickListener {
             onOptionsItemSelected(it)
         }
+    }
 
+    private fun carHereBtnOnClick() {
+        binding.carIsHereBtm.setOnClickListener {
+            navController.navigate(R.id.action_orderFragment_to_postOrderFragment)
+        }
+    }
+
+    private fun cancelBtnOnClick() {
+        binding.cancelOrderBtn.setOnClickListener {
+            binding.groupCarArrival.visibility = View.GONE
+            binding.groupInitialViewsOrder.visibility = View.VISIBLE
+            viewModel.cancelAllCoroutineJobs()
+            supportMapFragment?.getMapAsync { googleMap ->
+                googleMap.clear()
+            }
+            GlobalToast.showShort(context, "You've cancelled your order")
+        }
+    }
+
+    private fun orderBtnOnClick() {
         binding.orderButton.setOnClickListener {
+            viewModel.clearPickupAndDestinationLatLngs()
             if (setStringPickupAndDestinationAddress()) {
                 viewModel.getLatLngFromAddresses(geoCoder)
                 viewModel.hasResults.observe(viewLifecycleOwner) { hasResults ->
@@ -69,12 +97,10 @@ class OrderFragment() : Fragment() {
                         GlobalToast.showShort(context, "No results")
                         viewModel.doneShowingNoResultsToast()
                     }
-                    else if(hasResults){
-
+                    else if (hasResults) {
                         viewModel.getDirectionsResponse()
                         viewModel.directionsResponse.observe(viewLifecycleOwner) { response ->
                             if (response != null) {
-                                viewModel.clearPickupAndDestinationLatLngs()
                                 viewModel.destinationLatLng.observe(viewLifecycleOwner) {
                                     if (it != null && it.latitude != 0.0) {
                                         viewModel.generatePickupAndDestinationMarkers()
@@ -90,19 +116,6 @@ class OrderFragment() : Fragment() {
                     }
                 }
             }
-        }
-
-        binding.cancelOrderBtn.setOnClickListener {
-            binding.groupCarArrival.visibility = View.GONE
-            binding.groupInitialViewsOrder.visibility = View.VISIBLE
-            viewModel.cancelAllCoroutineJobs()
-            supportMapFragment?.getMapAsync { googleMap ->
-                googleMap.clear()
-            }
-            GlobalToast.showShort(context, "You've cancelled your order")
-        }
-        binding.carIsHereBtm.setOnClickListener {
-            navController.navigate(R.id.action_orderFragment_to_postOrderFragment)
         }
     }
 
@@ -120,11 +133,11 @@ class OrderFragment() : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.logoutItem -> {
-                GlobalToast.showShort(context, "Logout item pressed")
+                viewModel.logoutCurrentUser()
+                navController.navigate(R.id.action_global_loginFragment)
                 true
             }
             R.id.historyItem -> {
-                GlobalToast.showShort(context, "History item pressed")
                 navController.navigate(R.id.action_orderFragment_to_historyFragment)
                 true
             }
@@ -156,6 +169,7 @@ class OrderFragment() : Fragment() {
         val latLngBuilder = LatLngBounds.Builder()
         var bounds: LatLngBounds?
         viewModel.pickupAndDestinationMarkers.observe(viewLifecycleOwner) { markerOptions ->
+            Log.d("orderFragment", "markeroptions" + markerOptions.toString())
             supportMapFragment?.getMapAsync { googleMap ->
                 googleMap.clear()
                 if (markerOptions.isNotEmpty()) {

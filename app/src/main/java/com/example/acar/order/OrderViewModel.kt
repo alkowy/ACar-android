@@ -138,6 +138,7 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
             val destinationAddress = async(Dispatchers.IO) {
                 geoCoder.getFromLocationName(_stringDestinationAddress.value, 5)
             }.await()
+            Log.d("orderviewmodel", "pickupaddress: " + pickupAddress.toString())
             if (pickupAddress.isNotEmpty() && destinationAddress.isNotEmpty()) {
                 _hasResults.value = true
                 val pickupLocation = pickupAddress[0]
@@ -212,6 +213,10 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
 
     fun doneShowingNoResultsToast() {
         _hasResults.postValue(true)
+    }
+
+    fun logoutCurrentUser(){
+        authRepository.logoutCurrentUser()
     }
 
     // set route length in meters + cost 3zl per 1km

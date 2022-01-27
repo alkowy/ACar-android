@@ -18,7 +18,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import kotlin.math.log
 
-class HistoryAdapter(private val historyOfRides: ArrayList<RideHistoryItem>, private val viewModel: OrderViewModel) :
+class HistoryAdapter(private val historyOfRides: ArrayList<RideHistoryItem>) :
     ListAdapter<RideHistoryItem, HistoryAdapter.ViewHolder>(HistoryDiffCallback()) {
 
     class HistoryDiffCallback : DiffUtil.ItemCallback<RideHistoryItem>() {
@@ -46,20 +46,17 @@ class HistoryAdapter(private val historyOfRides: ArrayList<RideHistoryItem>, pri
 //              "https://maps.googleapis.com/maps/api/staticmap?size=400x200&markes=" + pickupLatLng + "|" + destinationLatLng + "&path=weight:3|color:blue|enc:"
             val encodedPolyLine = ride.polyLineOverview
             val baseGoogleUrl =
-                "https://maps.googleapis.com/maps/api/staticmap?size=400x200&markes=&path=weight:3|color:blue|enc:"
+                "https://maps.googleapis.com/maps/api/staticmap?size=400x200&scale=2&markes=&path=weight:3|color:blue|enc:"
             val formattedUrl = baseGoogleUrl + encodedPolyLine.replace("\\\\", "\\") + "&key=" + API_KEY
-                  Glide
-                    .with(itemBinding.root)
-                    .load(formattedUrl)
-                    .centerInside()
-                    .into(itemBinding.mapImage)
+            Glide.with(itemBinding.root).load(formattedUrl).centerInside().into(itemBinding.mapImage)
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemHistoryOrderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        // TODO: 17.01.2022  history of rides in viewmodel as alist   historyOfRides = viewmodle.list. so its initialised early
-        submitList(historyOfRides)
+        if (historyOfRides.isNotEmpty()) {
+            submitList(historyOfRides)
+        }
         return ViewHolder(binding)
     }
 
