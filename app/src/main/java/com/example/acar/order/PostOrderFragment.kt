@@ -109,7 +109,8 @@ class PostOrderFragment : Fragment() {
         viewModel.calculateTimeOfArrival()
         viewModel.timeOfArrival.observe(viewLifecycleOwner) {
             if (it != null) {
-                binding.estDestinationArrivalTxt.text = "Estimated time of arrival: $it"
+//                binding.estDestinationArrivalTxt.text = "Estimated time of arrival: $it"
+                binding.estDestinationArrivalTxt.text = getString(R.string.estTimeOfArrival,it)
             }
         }
     }

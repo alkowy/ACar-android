@@ -65,4 +65,9 @@ class HistoryFragment : Fragment() {
             ridesHistoryAdapter.submitList(it)
         }
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
