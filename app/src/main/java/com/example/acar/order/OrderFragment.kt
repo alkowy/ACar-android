@@ -1,45 +1,29 @@
 package com.example.acar.order
 
 
-import android.Manifest
-import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import com.example.acar.databinding.OrderFragmentBinding
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.SupportMapFragment
-import dagger.hilt.android.AndroidEntryPoint
-import android.content.Context
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.graphics.Color
-import android.location.Address
 import android.location.Geocoder
-import android.provider.Settings
-import android.text.Html
-import android.text.Spanned
+import android.os.Bundle
 import android.util.Log
-import android.view.*
-import android.widget.TextView
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.ui.res.stringResource
-import androidx.constraintlayout.widget.Group
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.navGraphViewModels
 import com.example.acar.R
 import com.example.acar.common.*
-import com.google.android.gms.location.FusedLocationProviderClient
+import com.example.acar.databinding.OrderFragmentBinding
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
-import com.google.firebase.auth.FirebaseAuth
-import dagger.hilt.android.qualifiers.ApplicationContext
-import org.w3c.dom.Text
-import java.io.IOException
+import dagger.hilt.android.AndroidEntryPoint
 import java.text.DateFormat
 import java.util.*
 
@@ -124,9 +108,7 @@ class OrderFragment() : Fragment() {
         val calendar = Calendar.getInstance()
         calendar.time = Date()
         calendar.add(Calendar.SECOND, 500)
-        binding.timeOfCarArrival.text = DateFormat
-                .getDateTimeInstance()
-                .format(calendar.time)
+        binding.timeOfCarArrival.text = DateFormat.getDateTimeInstance().format(calendar.time)
 
     }
 
@@ -134,7 +116,7 @@ class OrderFragment() : Fragment() {
         return when (item.itemId) {
             R.id.logoutItem -> {
                 viewModel.logoutCurrentUser()
-                navController.navigate(R.id.action_global_loginFragment)
+               showLogoutDialog(context,navController)
                 true
             }
             R.id.historyItem -> {
@@ -195,9 +177,7 @@ class OrderFragment() : Fragment() {
                         polylineOptions.add(latLng)
                     }
                 }
-                googleMap.addPolyline(polylineOptions
-                        .width(5F)
-                        .color(Color.BLUE))
+                googleMap.addPolyline(polylineOptions.width(5F).color(Color.BLUE))
             }
         }
     }
@@ -213,5 +193,10 @@ class OrderFragment() : Fragment() {
             GlobalToast.showShort(context, "Address is empty")
             return false
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
