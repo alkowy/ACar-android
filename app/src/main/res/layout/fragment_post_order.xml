@@ -11,7 +11,7 @@
         android:id="@+id/PostOrderMap"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:layout_marginBottom="250dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -36,16 +36,22 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-black"
         android:text="Route length:"
+        android:textSize="17sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/PostOrderMap" />
 
     <TextView
         android:id="@+id/estDestinationArrivalTxt"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:fontFamily="sans-serif-black"
         android:text="You will reach the destination in:"
+        android:textSize="17sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/estRouteLength"
         app:layout_constraintTop_toBottomOf="@+id/estRouteLength" />
 
@@ -54,33 +60,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:fontFamily="sans-serif-black"
         android:text="Cost:"
+        android:textSize="17sp"
         app:layout_constraintStart_toStartOf="@+id/estDestinationArrivalTxt"
         app:layout_constraintTop_toBottomOf="@+id/estDestinationArrivalTxt" />
 
     <Button
-        android:id="@+id/directionsBtn"
-        android:layout_width="wrap_content"
+        android:id="@+id/hereBtn"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="DirectionsTest"
-        app:layout_constraintBottom_toTopOf="@+id/cancelBtn"
-        app:layout_constraintStart_toStartOf="@+id/cancelBtn" />
-
-    <Button
-        android:id="@+id/drawPolyLine"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="draw"
-        app:layout_constraintBottom_toTopOf="@+id/cancelBtn"
-        app:layout_constraintStart_toEndOf="@+id/directionsBtn" />
-
-    <Button
-        android:id="@+id/imHereBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:text="I'm here"
         app:layout_constraintBottom_toTopOf="@+id/cancelBtn"
-        app:layout_constraintStart_toEndOf="@+id/drawPolyLine" />
+        app:layout_constraintEnd_toEndOf="@+id/cancelBtn"
+        app:layout_constraintStart_toStartOf="@+id/cancelBtn" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -11,65 +11,129 @@
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:layout_marginBottom="250dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/orderToolbar" />
 
     <EditText
         android:id="@+id/editTextPickup"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
         android:ems="10"
         android:hint="Pickup location"
         android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/map" />
 
     <Button
         android:id="@+id/orderButton"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:text="order"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextDestination"
-        app:layout_constraintStart_toEndOf="@+id/editTextPickup" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextDestination" />
 
-    <Button
-        android:id="@+id/testMarkerBtn"
+    <EditText
+        android:id="@+id/editTextDestination"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:ems="10"
+        android:hint="Destination"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextPickup" />
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/orderToolbar"
+        android:layout_width="409dp"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:menu="@menu/toolbar_menu"
+        app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    <TextView
+        android:id="@+id/carArriveTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="273dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="8dp"
-        android:text="test marker"
+        android:layout_marginTop="32dp"
+        android:gravity="center"
+        android:text="@string/carWillArriveAt"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map"
+        tools:text="Your car will arrive at: "
+        tools:visibility="visible" />
+
+    <TextView
+        android:id="@+id/timeOfCarArrival"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-black"
+        android:text="05.04.2022 4:33PM"
+        android:textSize="22sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/carArriveTextView"
+        app:layout_constraintStart_toStartOf="@+id/carArriveTextView"
+        app:layout_constraintTop_toBottomOf="@+id/carArriveTextView"
+        tools:text="05.04.2022 4:33PM"
+        tools:visibility="visible" />
+
+    <Button
+        android:id="@+id/cancelOrderBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
+        android:text="Cancel"
+        android:visibility="gone"
+        tools:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <EditText
-        android:id="@+id/editTextDestination"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="Destination"
-        android:inputType="textPersonName"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextPickup" />
-
     <Button
-        android:id="@+id/testNavToPost"
+        android:id="@+id/carIsHereBtm"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Car is here"
+        app:layout_constraintBottom_toTopOf="@+id/cancelOrderBtn"
+        app:layout_constraintEnd_toEndOf="@+id/cancelOrderBtn"
+        app:layout_constraintStart_toStartOf="@+id/cancelOrderBtn" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupInitialViewsOrder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:text="nav postOrder"
-        app:layout_constraintBottom_toTopOf="@+id/testMarkerBtn"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:visibility="visible"
+        app:constraint_referenced_ids="editTextPickup,editTextDestination,orderButton" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupCarArrival"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="carArriveTextView,timeOfCarArrival,cancelOrderBtn,carIsHereBtm"
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
