@@ -1,6 +1,5 @@
 package com.example.acar.login
 
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.example.acar.R
 import com.example.acar.common.GlobalToast
@@ -56,9 +54,11 @@ class LoginFragment : Fragment() {
             when {
                 email.isEmpty() -> GlobalToast.showShort(context, "E-mail is required")
                 password.isEmpty() -> GlobalToast.showShort(context, "Password is required")
-                else -> viewModel.login(email, password)
+                else -> {
+                    viewModel.login(email, password)
+                }
             }
-       }
+        }
     }
 
     private fun observeLoginStatus() {
@@ -74,6 +74,7 @@ class LoginFragment : Fragment() {
             }
         }
     }
+
     private fun fakeLogin() {
         binding.testLoginBtn.setOnClickListener {
             viewModel.login("test@gmail.com", "123456")

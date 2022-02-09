@@ -211,7 +211,7 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
         _hasResults.postValue(true)
     }
 
-    fun logoutCurrentUser(){
+    fun logoutCurrentUser() {
         authRepository.logoutCurrentUser()
     }
 

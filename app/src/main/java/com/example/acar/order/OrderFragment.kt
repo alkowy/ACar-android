@@ -1,8 +1,6 @@
 package com.example.acar.order
 
 
-import android.app.AlertDialog
-import android.content.DialogInterface
 import android.graphics.Color
 import android.location.Geocoder
 import android.os.Bundle
@@ -24,8 +22,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.PolylineOptions
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import java.text.DateFormat
 import java.util.*
 
@@ -81,7 +77,7 @@ class OrderFragment() : Fragment() {
                 viewModel.hasResults.observe(viewLifecycleOwner) { hasResults ->
                     if (!hasResults) {
                         GlobalToast.showShort(context, "No results")
-                        viewModel.doneShowingNoResultsToast()
+                        //    viewModel.doneShowingNoResultsToast()
                     }
                     else {
                         viewModel.getDirectionsResponse()
@@ -102,7 +98,6 @@ class OrderFragment() : Fragment() {
                         }
                     }
                 }
-
             }
         }
     }
@@ -156,7 +151,6 @@ class OrderFragment() : Fragment() {
         val latLngBuilder = LatLngBounds.Builder()
         var bounds: LatLngBounds?
         viewModel.pickupAndDestinationMarkers.observe(viewLifecycleOwner) { markerOptions ->
-            Log.d("orderFragment", "markeroptions" + markerOptions.toString())
             supportMapFragment?.getMapAsync { googleMap ->
                 googleMap.clear()
                 if (markerOptions.isNotEmpty()) {
