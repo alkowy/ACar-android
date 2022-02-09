@@ -24,6 +24,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.PolylineOptions
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import java.text.DateFormat
 import java.util.*
 
@@ -81,27 +83,30 @@ class OrderFragment() : Fragment() {
                         GlobalToast.showShort(context, "No results")
                         viewModel.doneShowingNoResultsToast()
                     }
-                    else if (hasResults) {
+                    else {
                         viewModel.getDirectionsResponse()
                         viewModel.directionsResponse.observe(viewLifecycleOwner) { response ->
                             if (response != null) {
                                 viewModel.destinationLatLng.observe(viewLifecycleOwner) {
-                                    if (it != null && it.latitude != 0.0) {
+                                    if (it.latitude != 0.0) {
                                         viewModel.generatePickupAndDestinationMarkers()
                                         createPickupAndDestinationMarkers()
                                         observeAndCreatePolyLines()
                                     }
+                                    binding.groupInitialViewsOrder.visibility = View.GONE
+                                    binding.groupCarArrival.visibility = View.VISIBLE
+                                    setCarArrivalTime()
+
                                 }
-                                binding.groupInitialViewsOrder.visibility = View.GONE
-                                binding.groupCarArrival.visibility = View.VISIBLE
-                                setCarArrivalTime()
                             }
                         }
                     }
                 }
+
             }
         }
     }
+
 
     // sets the textview to current time +5min
     private fun setCarArrivalTime() {
@@ -116,7 +121,7 @@ class OrderFragment() : Fragment() {
         return when (item.itemId) {
             R.id.logoutItem -> {
                 viewModel.logoutCurrentUser()
-               showLogoutDialog(context,navController)
+                showLogoutDialog(context, navController)
                 true
             }
             R.id.historyItem -> {

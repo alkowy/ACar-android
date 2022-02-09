@@ -51,3 +51,11 @@ fun showLogoutDialog(context: Context?, navController: NavController) {
         dialog.dismiss()
     }
 }
+fun showEndOfRideDialog(context: Context?, navController: NavController){
+    val dialog = AlertDialog.Builder(context).setCancelable(true).setView(R.layout.layout_end_of_ride_dialog)
+    dialog.setOnCancelListener {
+        navController.navigate(R.id.action_postOrderFragment_to_orderFragment)
+    }
+    dialog.show()
+
+}

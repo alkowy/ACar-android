@@ -108,8 +108,6 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
             _listOfRidesHistory.value = (tempListOfRides as ArrayList<RideHistoryItem>)
         }
         _listOfRidesHistory.value = (tempListOfRides as ArrayList<RideHistoryItem>?)
-        Log.d("orderviewmodel addridetohistory:", _listOfRidesHistory.value.toString())
-        Log.d("orderviewmodel addridetohistory:", ride.toString())
         dbRepo.addRideToTheHistoryDb(authRepository.currentLoggedInUser.value!!.uid, ride)
     }
 
@@ -138,14 +136,12 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
             val destinationAddress = async(Dispatchers.IO) {
                 geoCoder.getFromLocationName(_stringDestinationAddress.value, 5)
             }.await()
-            Log.d("orderviewmodel", "pickupaddress: " + pickupAddress.toString())
             if (pickupAddress.isNotEmpty() && destinationAddress.isNotEmpty()) {
-                _hasResults.value = true
                 val pickupLocation = pickupAddress[0]
                 val destinationLocation = destinationAddress[0]
                 _pickupLatLng.value = LatLng(pickupLocation.latitude, pickupLocation.longitude)
                 _destinationLatLng.value = LatLng(destinationLocation.latitude, destinationLocation.longitude)
-                Log.d("orderviewmodel pickupaddressnoresults: ", pickupLocation.toString())
+                _hasResults.value = true
             }
             else {
                 _hasResults.value = false
@@ -219,7 +215,7 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
         authRepository.logoutCurrentUser()
     }
 
-    // set route length in meters + cost 3zl per 1km
+    // set route length in meters + cost 0.5$ per kilometer
     fun calculateRouteLengthAndCost() {
         var routeLength = 0
         val routes = _directionsResponse.value!!.body()?.routes
@@ -229,7 +225,7 @@ class OrderViewModel @Inject constructor(private var googleApiRepository: Google
             }
         }
         _routeLength.postValue(routeLength.toDouble() / 1000)
-        _estimatedCost.postValue(routeLength.toDouble().div(1000).times(3))
+        _estimatedCost.postValue(routeLength.toDouble().div(1000).times(0.5))
     }
 }
 
