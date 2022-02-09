@@ -10,7 +10,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.acar.R
 import com.example.acar.common.AppModule
 import com.example.acar.common.AuthRepository
@@ -41,7 +43,7 @@ class HistoryFragment : Fragment() {
         viewModel = ViewModelProvider(store, viewModelFactory)[OrderViewModel::class.java]
         _binding = HistoryFragmentBinding.inflate(layoutInflater)
         binding.historyToolbar.let {
-            it.setNavigationIcon(R.drawable.common_google_signin_btn_icon_dark)
+            it.setNavigationIcon(R.drawable.ic_baseline_arrow_back_ios_24)
             it.setNavigationOnClickListener { navController.navigate(R.id.action_historyFragment_to_orderFragment) }
         }
         return binding.root
@@ -56,6 +58,7 @@ class HistoryFragment : Fragment() {
         ridesHistoryAdapter = HistoryAdapter(rides)
         rvRides.adapter = ridesHistoryAdapter
         rvRides.layoutManager = LinearLayoutManager(context)
+        rvRides.addItemDecoration(DividerItemDecoration(context,LinearLayoutManager.VERTICAL))
 
     }
 

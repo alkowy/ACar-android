@@ -8,7 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.example.acar.R
 import com.example.acar.common.GlobalToast
 import com.example.acar.databinding.RegistrationFragmentBinding
@@ -22,16 +24,21 @@ class RegistrationFragment : Fragment() {
     private val viewModel: RegistrationViewModel by viewModels()
     private var _binding: RegistrationFragmentBinding? = null
     private val binding get() = _binding!!
+    private lateinit var navController: NavController
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         //   observeIsRegistrationSuccessful()
         onClickRegisterButton()
+        binding.registerBackToLoginText.setOnClickListener {
+            navController.navigate(R.id.action_registrationFragment_to_loginFragment)
+        }
 
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = RegistrationFragmentBinding.inflate(layoutInflater)
+        navController = findNavController()
         return binding.root
     }
 
